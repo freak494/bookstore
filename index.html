@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#765477">
+<title>Книжный магазин</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#f1dcef;--card:#f9eaf6;--accent:#765477;--soft:#d9b4d5;--ink:#302a3a;--muted:#766e7d}
+*{box-sizing:border-box}body{margin:0;background:#eeeaf0;color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:1120px;margin:auto;min-height:100vh;padding:22px}
+.shell{background:var(--bg);border-radius:28px;padding:22px;min-height:calc(100vh - 44px);transition:background .25s}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.brand{font-size:27px;font-weight:850;letter-spacing:-1px}.brand small{display:block;font-size:10px;letter-spacing:1.5px;color:var(--accent);font-weight:700}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:white}
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;background:var(--card);padding:7px;border-radius:18px;margin-bottom:25px}
+nav button{min-width:0;background:transparent;color:var(--accent);border-radius:12px;padding:10px 3px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:650;white-space:nowrap}
+nav button.active{background:var(--accent);color:white}
+nav .ico{font-size:17px}
+h1{font-size:clamp(25px,4vw,34px);margin:3px 0}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1px}.subtitle{color:var(--muted);margin:0 0 20px}
+.panel{background:var(--card);border-radius:22px;padding:20px;margin:14px 0}
+.panel h2{font-size:18px;margin:0 0 15px}.metric{font-size:34px;font-weight:800;letter-spacing:-1px}.muted{color:var(--muted)}.green{color:#34865a}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:12px 0}
+input,select{border:1px solid #00000012;border-radius:12px;padding:11px 12px;background:#fff;color:var(--ink);min-width:0}
+input{flex:1}.btn{padding:10px 14px;border-radius:12px;background:var(--accent);color:#fff;font-weight:700}.btn.light{background:white;color:var(--accent);border:1px solid var(--soft)}.btn.small{padding:7px 10px;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:var(--card);border-radius:18px;padding:16px}.stat strong{display:block;font-size:25px}.stat span{font-size:12px;color:var(--muted)}
+.chart{height:150px;display:flex;align-items:end;gap:10px;padding:10px 0 0}.bar{flex:1;background:var(--soft);border-radius:8px 8px 3px 3px;min-width:8px}.bar:last-child{background:var(--accent)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.book,.order,.client{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--soft)}.book:last-child,.order:last-child,.client:last-child{border:0}
+.cover{width:54px;height:68px;border-radius:9px;background:var(--bg);display:grid;place-items:center;font-size:27px;flex-shrink:0}
+.book-info{flex:1;min-width:0}.book-info b{display:block}.book-info small{color:var(--muted)}.price{color:var(--accent);font-weight:800}
+.pill{display:inline-block;border-radius:99px;padding:5px 9px;background:#fff;color:var(--accent);font-size:11px;font-weight:750}.pill.warn{color:#a36c25}.pill.bad{color:#b44d4d}.pill.good{color:#34865a}
+.formbox{background:var(--bg);padding:14px;border-radius:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.formbox input,.formbox select{width:100%}.formbox .wide{grid-column:1/-1}
+.client-icon{width:42px;height:42px;background:var(--bg);color:var(--accent);border-radius:50%;display:grid;place-items:center;font-weight:800}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:650px){.app{padding:0}.shell{border-radius:0;padding:15px;min-height:100vh}nav button{font-size:10px;gap:3px;flex-direction:column;padding:8px 1px}.ico{font-size:16px}.stats{grid-template-columns:repeat(2,1fr)}.panel{padding:16px}.formbox{grid-template-columns:1fr}.formbox .wide{grid-column:auto}}
+@media(max-width:360px){nav button{font-size:9px}.brand{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="app"><main class="shell" id="shell">
+<header><div class="brand">Книжный магазин<small>УПРАВЛЕНИЕ МАГАЗИНОМ</small></div><div class="avatar">КМ</div></header>
+<nav id="nav"></nav><section id="content"></section>
+</main></div>
+<script>
+const themes={
+'Главная':['#f1dcef','#f9eaf6','#765477','#d9b4d5'],
+'Каталог':['#e8dff5','#f5effb','#725a9a','#c7b4e2'],
+'Заказы':['#dce8f8','#eef4fc','#536e9c','#b2c7ea'],
+'Склад':['#f5e9cc','#fcf5e6','#a17a40','#dec18b'],
+'Клиенты':['#dcefe5','#f0f8f3','#52846b','#add2b9']
+};
+const icons={'Главная':'⌂','Каталог':'▤','Заказы':'▣','Склад':'▦','Клиенты':'♙'};
+let page='Главная',period='Неделя',filter='Все',search='',showForm=false,editing=null;
+let books=JSON.parse(localStorage.getItem('books')||'null')||[
+{id:1,name:'Мастер и Маргарита',author:'Михаил Булгаков',price:890,stock:12,cat:'Классика',emoji:'📕'},
+{id:2,name:'1984',author:'Джордж Оруэлл',price:720,stock:8,cat:'Фантастика',emoji:'📘'},
+{id:3,name:'Преступление и наказание',author:'Фёдор Достоевский',price:650,stock:3,cat:'Классика',emoji:'📙'},
+{id:4,name:'Цветы для Элджернона',author:'Дэниел Киз',price:780,stock:6,cat:'Фантастика',emoji:'📔'},
+{id:5,name:'Тонкое искусство пофигизма',author:'Марк Мэнсон',price:990,stock:15,cat:'Психология',emoji:'📗'},
+{id:6,name:'Атлант расправил плечи',author:'Айн Рэнд',price:1200,stock:0,cat:'Роман',emoji:'📓'}];
+let orders=JSON.parse(localStorage.getItem('orders')||'null')||[
+{id:1042,name:'Александр Иванов',total:1610,count:2,status:'Новый'},
+{id:1041,name:'Мария Смирнова',total:890,count:1,status:'В обработке'},
+{id:1040,name:'Дмитрий Петров',total:2340,count:3,status:'Готов'},
+{id:1039,name:'Анна Кузнецова',total:650,count:1,status:'Завершён'}];
+const clients=[{name:'Александр Иванов',email:'alex@example.com',count:12},{name:'Мария Смирнова',email:'maria@example.com',count:8},{name:'Дмитрий Петров',email:'dima@example.com',count:5},{name:'Анна Кузнецова',email:'anna@example.com',count:3}];
+function save(){localStorage.setItem('books',JSON.stringify(books));localStorage.setItem('orders',JSON.stringify(orders))}
+function money(n){return n.toLocaleString('ru-RU')+' ₽'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function nav(){document.querySelector('#nav').innerHTML=Object.keys(themes).map(n=>`<button class="${page===n?'active':''}" data-page="${n}"><span class="ico">${icons[n]}</span><span>${n}</span></button>`).join('');document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page=b.dataset.page;showForm=false;editing=null;render()})}
+function header(){let titles={'Главная':['Добро пожаловать!','Всё о твоём книжном магазине'],'Каталог':['Мир книг','Твоя библиотека в одном месте'],'Заказы':['Управление заказами','Контролируй каждый заказ'],'Склад':['Склад магазина','Остатки и движение товаров'],'Клиенты':['Наши читатели','Покупатели и история покупок']};return `<div class="eyebrow">КНИЖНЫЙ МАГАЗИН / ${page.toUpperCase()}</div><h1>${titles[page][0]}</h1><p class="subtitle">${titles[page][1]}</p>`}
+function home(){let vals=period==='День'?[35,55,45,80,60,95]:period==='Неделя'?[40,65,35,75,55,90,100]:[45,60,70,40,85,65,95];return `<div class="panel"><div class="row"><span class="muted">Общая выручка</span><span>↗ <b class="green">12,8%</b></span></div><div class="metric">128 450 ₽</div><div class="toolbar">${['День','Неделя','Месяц'].map(x=>`<button class="btn ${period===x?'':'light'} small" data-period="${x}">${x}</button>`).join('')}</div><div class="chart">${vals.map(v=>`<div class="bar" style="height:${v}%"></div>`).join('')}</div><small class="muted">Динамика продаж за ${period.toLowerCase()}</small></div><div class="stats">${[[orders.length,'Заказов'],[books.reduce((s,b)=>s+b.stock,0),'Книг на складе'],[clients.length,'Покупателей'],[books.filter(b=>b.stock<=3).length,'Проблемных позиций']].map(x=>`<div class="stat"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}</div><div class="panel"><h2>Последние заказы</h2>${orders.slice(0,3).map(orderCard).join('')}<button class="btn" data-goto="Заказы">Все заказы</button></div>`}
+function orderCard(o){let cls=o.status==='Завершён'?'good':o.status==='Новый'?'warn':o.status==='Отменён'?'bad':'';return `<div class="order"><div style="flex:1"><b>Заказ №${o.id}</b><div class="muted">${esc(o.name)}</div><b class="price">${money(o.total)}</b></div><span class="pill ${cls}">${o.status}</span></div>`}
+function catalog(){let list=books.filter(b=>(filter==='Все'||b.cat===filter)&&(b.name+' '+b.author).toLowerCase().includes(search.toLowerCase()));return `<div class="panel"><div class="row"><h2>Каталог книг</h2><span class="pill">${books.length} книг</span></div><div class="toolbar"><input id="search" placeholder="Название или автор..." value="${esc(search)}"><button class="btn" id="add">＋ Добавить</button></div><div class="toolbar">${['Все','Классика','Фантастика','Психология','Роман'].map(c=>`<button class="btn small ${filter===c?'':'light'}" data-filter="${c}">${c}</button>`).join('')}</div>${showForm?bookForm():''}${list.length?list.map(b=>`<div class="book"><div class="cover">${b.emoji}</div><div class="book-info"><b>${esc(b.name)}</b><small>${esc(b.author)}</small><div class="row"><span class="price">${money(b.price)}</span><span class="pill ${b.stock===0?'bad':b.stock<=3?'warn':'good'}">${b.stock} шт.</span></div><button class="btn light small" data-edit="${b.id}">Изменить</button> <button class="btn light small" data-delete="${b.id}">Удалить</button></div></div>${editing===b.id?bookForm(b):''}`).join(''):'<div class="empty">Книги не найдены</div>'}</div>`}
+function bookForm(b=null){return `<form class="formbox" id="bookform"><input class="wide" name="name" placeholder="Название книги" required value="${esc(b?.name||'')}"><input name="author" placeholder="Автор" required value="${esc(b?.author||'')}"><input name="price" type="number" min="1" placeholder="Цена, ₽" required value="${b?.price||''}"><input name="stock" type="number" min="0" placeholder="Количество" required value="${b?.stock??''}"><select name="cat"><option ${b?.cat==='Классика'?'selected':''}>Классика</option><option ${b?.cat==='Фантастика'?'selected':''}>Фантастика</option><option ${b?.cat==='Психология'?'selected':''}>Психология</option><option ${b?.cat==='Роман'?'selected':''}>Роман</option></select><button class="btn" type="submit">Сохранить</button></form>`}
+function orderPage(){return `<div class="panel"><h2>Все заказы</h2>${orders.map(o=>`<div class="panel" style="margin:10px 0;background:var(--bg)"><div class="row"><b>Заказ №${o.id}</b><span class="pill">${o.status}</span></div><p class="muted">${esc(o.name)}</p><div class="row"><span>${o.count} товара</span><b>${money(o.total)}</b></div><div class="toolbar"><select data-status="${o.id}">${['Новый','В обработке','Готов','Завершён','Отменён'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></div></div>`).join('')}</div>`}
+function stock(){return `<div class="panel"><h2>Управление запасами</h2><div class="metric">${books.reduce((s,b)=>s+b.stock,0)}</div><p class="muted">Всего экземпляров на складе</p>${books.map(b=>`<div class="book"><div class="book-info"><b>${esc(b.name)}</b><small>${b.stock===0?'Нет в наличии':b.stock+' экземпляров'}</small></div><button class="btn light small" data-stock="${b.id}" data-delta="-1" ${b.stock===0?'disabled':''}>−</button><button class="btn small" data-stock="${b.id}" data-delta="1">＋</button></div>`).join('')}</div>`}
+function customerPage(){return `<div class="panel"><h2>Покупатели магазина</h2><div class="metric">${clients.length}</div><p class="muted">Демонстрационных клиентов</p>${clients.map(c=>`<div class="client"><div class="client-icon">${c.name[0]}</div><div style="flex:1"><b>${c.name}</b><div class="muted">${c.email}</div></div><span class="pill">${c.count} покупок</span></div>`).join('')}</div>`}
+function bind(){document.querySelectorAll('[data-period]').forEach(b=>b.onclick=()=>{period=b.dataset.period;render()});document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{page=b.dataset.goto;render()});document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});let si=document.querySelector('#search');if(si)si.oninput=e=>{search=e.target.value;let pos=search.length;render();let n=document.querySelector('#search');n.focus();n.setSelectionRange(pos,pos)};let add=document.querySelector('#add');if(add)add.onclick=()=>{showForm=!showForm;editing=null;render()};document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{editing=Number(b.dataset.edit);showForm=false;render()});document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('Удалить книгу из каталога?')){books=books.filter(x=>x.id!==Number(b.dataset.delete));save();render()}});document.querySelectorAll('[data-stock]').forEach(b=>b.onclick=()=>{let x=books.find(x=>x.id===Number(b.dataset.stock));x.stock=Math.max(0,x.stock+Number(b.dataset.delta));save();render()});document.querySelectorAll('[data-status]').forEach(s=>s.onchange=()=>{orders.find(x=>x.id===Number(s.dataset.status)).status=s.value;save();render()});let f=document.querySelector('#bookform');if(f)f.onsubmit=e=>{e.preventDefault();let d=new FormData(f),obj={name:d.get('name').trim(),author:d.get('author').trim(),price:Number(d.get('price')),stock:Number(d.get('stock')),cat:d.get('cat'),emoji:'📚'};if(editing!==null){Object.assign(books.find(x=>x.id===editing),obj)}else{books.push({id:Math.max(0,...books.map(x=>x.id))+1,...obj})}save();showForm=false;editing=null;render()}}
+function render(){let p=themes[page];document.documentElement.style.setProperty('--bg',p[0]);document.documentElement.style.setProperty('--card',p[1]);document.documentElement.style.setProperty('--accent',p[2]);document.documentElement.style.setProperty('--soft',p[3]);document.querySelector('#shell').style.background=p[0];nav();document.querySelector('#content').innerHTML=header()+({'Главная':home,'Каталог':catalog,'Заказы':orderPage,'Склад':stock,'Клиенты':customerPage}[page])();bind()}
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
